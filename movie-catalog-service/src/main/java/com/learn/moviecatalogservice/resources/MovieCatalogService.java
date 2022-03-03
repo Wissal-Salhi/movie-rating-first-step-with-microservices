@@ -33,7 +33,7 @@ public class MovieCatalogService {
 		
 		//get all rated movies IDs
 		UserRating userRating = restTemplate.getForObject(
-				 "http://localhost:8089/ratingsdata/users/"+userId, 
+				 "http://rating-data-service/ratingsdata/users/"+userId, 
 				  UserRating.class);
 		
 		//for each movie Id, call movie info service and get details (communication betweenmicroservices)
@@ -48,7 +48,7 @@ public class MovieCatalogService {
 					.block();//wait until the movie object is in the container (mono)
 				 */
 			
-				Movie movie = restTemplate.getForObject("http://localhost:8088/movies/"+rating.getMovieId(), Movie.class);// this will unmarshel the result we get into movie object (needs default constructor)                   
+				Movie movie = restTemplate.getForObject("http://movie-info-service/movies/"+rating.getMovieId(), Movie.class);// this will unmarshel the result we get into movie object (needs default constructor)                   
 				return new CatalogItem(movie.getName(),movie.getName() +" desc", rating.getRating());
 		})
 		.collect(Collectors.toList());
