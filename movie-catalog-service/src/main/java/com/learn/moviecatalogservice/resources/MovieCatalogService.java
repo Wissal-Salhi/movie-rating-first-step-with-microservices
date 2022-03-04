@@ -1,6 +1,5 @@
 package com.learn.moviecatalogservice.resources;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,9 +11,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.learn.moviecatalogservice.entities.CatalogItem;
-import com.learn.moviecatalogservice.entities.Movie;
 import com.learn.moviecatalogservice.entities.UserRating;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.learn.moviecatalogservice.services.MovieInfo;
+import com.learn.moviecatalogservice.services.UserRatingInfo;
 
 @RestController
 @RequestMapping("/catalog")
@@ -26,37 +25,36 @@ public class MovieCatalogService {
 	@Autowired
 	WebClient.Builder webClientBuilder;
 	
+	@Autowired
+	MovieInfo movieInfo;
+	
+	@Autowired
+	UserRatingInfo userRatingInfo;
+	
 	
 	@RequestMapping("/{userId}")
-	@HystrixCommand(fallbackMethod ="getFallbackCatalog")
 	public List<CatalogItem> getCatalog (@PathVariable String userId){
 		
 		//get all rated movies IDs
-		UserRating userRating = restTemplate.getForObject(
-				 "http://rating-data-service/ratingsdata/users/"+userId, 
-				  UserRating.class);
+		UserRating userRating = userRatingInfo.getUserRating(userId);
 		
 		//for each movie Id, call movie info service and get details (communication betweenmicroservices)
 		return userRating.getUserRating().stream().map(rating -> {
-			
-				//using web client
-				/*Movie movie=webClientBuilder.build()
-					.get()
-					.uri("http://localhost:8088/movies/"+rating.getMovieId())
-					.retrieve()
-					.bodyToMono(Movie.class)
-					.block();//wait until the movie object is in the container (mono)
-				 */
-			
-				Movie movie = restTemplate.getForObject("http://movie-info-service/movies/"+rating.getMovieId(), Movie.class);// this will unmarshel the result we get into movie object (needs default constructor)                   
-				return new CatalogItem(movie.getName(),movie.getDesc(), rating.getRating());
+				return movieInfo.getCatalogItem(rating);
 		})
 		.collect(Collectors.toList());
-		//put them all together
+
+		//using web client (code inside getCatalogItem
+		/*Movie movie=webClientBuilder.build()
+			.get()
+			.uri("http://localhost:8088/movies/"+rating.getMovieId())
+			.retrieve()
+			.bodyToMono(Movie.class)
+			.block();//wait until the movie object is in the container (mono)
+		 */
 	}
 	
-	public List<CatalogItem> getFallbackCatalog (@PathVariable String userId){
-		return Arrays.asList(new CatalogItem("No Movie","",0));
-	}
+
 	
+
 }
