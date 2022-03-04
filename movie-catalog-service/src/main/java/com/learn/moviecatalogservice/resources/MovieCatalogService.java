@@ -1,6 +1,5 @@
 package com.learn.moviecatalogservice.resources;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,8 +13,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.learn.moviecatalogservice.entities.CatalogItem;
 import com.learn.moviecatalogservice.entities.Movie;
-import com.learn.moviecatalogservice.entities.Rating;
 import com.learn.moviecatalogservice.entities.UserRating;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 @RestController
 @RequestMapping("/catalog")
@@ -29,6 +28,7 @@ public class MovieCatalogService {
 	
 	
 	@RequestMapping("/{userId}")
+	@HystrixCommand(fallbackMethod ="getFallbackCatalog")
 	public List<CatalogItem> getCatalog (@PathVariable String userId){
 		
 		//get all rated movies IDs
@@ -52,9 +52,11 @@ public class MovieCatalogService {
 				return new CatalogItem(movie.getName(),movie.getDesc(), rating.getRating());
 		})
 		.collect(Collectors.toList());
-		
-		
 		//put them all together
-		
 	}
+	
+	public List<CatalogItem> getFallbackCatalog (@PathVariable String userId){
+		return Arrays.asList(new CatalogItem("No Movie","",0));
+	}
+	
 }
