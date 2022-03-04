@@ -49,7 +49,7 @@ public class MovieCatalogService {
 				 */
 			
 				Movie movie = restTemplate.getForObject("http://movie-info-service/movies/"+rating.getMovieId(), Movie.class);// this will unmarshel the result we get into movie object (needs default constructor)                   
-				return new CatalogItem(movie.getName(),movie.getName() +" desc", rating.getRating());
+				return new CatalogItem(movie.getName(),movie.getDesc(), rating.getRating());
 		})
 		.collect(Collectors.toList());
 		
