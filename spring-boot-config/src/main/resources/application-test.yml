@@ -1,4 +1,4 @@
-server.port: 8086
+server.port: 8085
 
 my:
    greeting: Hello world

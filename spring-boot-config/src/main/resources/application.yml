@@ -1,4 +1,4 @@
-server.port: 8086
+server.port: 8085
 
 my:
    greeting: Hello world
@@ -12,4 +12,8 @@ db:
    port: 4000
 
 management.endpoints.web.exposure.include: "*"
-spring.profiles.active: test
+
+spring.config.import: "optional:configserver:"
+spring.cloud.config.uri: http://localhost:8086
+
+spring.application.name: spring-boot-config
