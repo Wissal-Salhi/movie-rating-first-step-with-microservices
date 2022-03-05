@@ -1,0 +1,14 @@
+server.port: 8086
+
+my:
+   greeting: Hello world
+   list:
+      values: one,two,three
+
+db:
+   values: "{username:'wiss test', password:'wiss2'}"
+   host: 129.0.0.1
+   port: 5000
+   
+
+management.endpoints.web.exposure.include: "*"

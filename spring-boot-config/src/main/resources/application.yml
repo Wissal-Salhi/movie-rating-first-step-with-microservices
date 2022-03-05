@@ -1,0 +1,15 @@
+server.port: 8086
+
+my:
+   greeting: Hello world
+   list:
+      values: one,two,three
+
+
+db:
+   values: "{username:'wiss', password:'wiss2'}"
+   host: 127.0.0.1
+   port: 4000
+
+management.endpoints.web.exposure.include: "*"
+spring.profiles.active: test
